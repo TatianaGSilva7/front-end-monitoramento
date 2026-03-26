@@ -15,6 +15,7 @@ async function getCode1() {
     }
 }
 
+/*
 const qrcode = new QRCode("qrcode1",{
     text: "https://hogangnono.com",
     width: 128,
@@ -24,6 +25,7 @@ const qrcode = new QRCode("qrcode1",{
     correctLevel : QRCode.CorrectLevel.H
 });
 
+*/
 async function criarCode() {
     //const dados = await getCode1()
 

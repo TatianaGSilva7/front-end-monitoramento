@@ -34,7 +34,7 @@ async function criarCode() {
 
 }
 
-criarCode()
+//criarCode()
 
 
 new QRCode(document.getElementById("qrcode1"), "http://jindo.dev.naver.com/collie");

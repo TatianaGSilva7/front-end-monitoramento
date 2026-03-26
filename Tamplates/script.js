@@ -3,6 +3,7 @@ function alerta() {
     alert("Olá, você clicou no botão!");
 }
 
+/*
 
 async function getCode1() {
     const url = ""
@@ -15,7 +16,6 @@ async function getCode1() {
     }
 }
 
-/*
 const qrcode = new QRCode("qrcode1",{
     text: "https://hogangnono.com",
     width: 128,
@@ -37,4 +37,4 @@ async function criarCode() {
 //criarCode()
 
 
-new QRCode(document.getElementById("qrcode1"), "http://jindo.dev.naver.com/collie");
+//new QRCode(document.getElementById("qrcode1"), "http://jindo.dev.naver.com/collie");

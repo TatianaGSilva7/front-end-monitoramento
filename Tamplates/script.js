@@ -7,20 +7,32 @@ function alerta() {
 async function getCode1() {
     const url = ""
     try {
-        fetch(url)
-            .then(response => response.json)
+        const response = await fetch(url)
+        const data = await response
+        return data
     } catch(err) {
         alert("Não foi possivel pegar os dados")
     }
 }
 
-const qrcode = new QRCode("qrcode1")
+const qrcode = new QRCode("qrcode1",{
+    text: "https://hogangnono.com",
+    width: 128,
+    height: 128,
+    colorDark : "#000000",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+});
 
-function criarCode() {
-    const elText = document.getElementById("text");
+async function criarCode() {
+    //const dados = await getCode1()
 
+    dados = "https://hogangnono.com"
+    qrcode.criarCode(dados)
 
 }
+
+criarCode()
 
 
 new QRCode(document.getElementById("qrcode1"), "http://jindo.dev.naver.com/collie");

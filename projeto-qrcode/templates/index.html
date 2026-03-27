@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Leitor QR Code</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: #16213e;
+            border: 1px solid #0f3460;
+            border-radius: 12px;
+            padding: 40px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        h1 { font-size: 1.4rem; margin-bottom: 8px; color: #e94560; }
+        p.sub { font-size: 0.85rem; color: #888; margin-bottom: 30px; }
+
+        .status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #888;
+            transition: background 0.3s;
+        }
+        .dot.ok  { background: #4caf50; box-shadow: 0 0 6px #4caf50; }
+        .dot.err { background: #e94560; box-shadow: 0 0 6px #e94560; }
+
+        .resultado {
+            background: #0f3460;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            word-break: break-all;
+        }
+
+        .resultado .label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .resultado .valor {
+            font-size: 1rem;
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .resultado .vazio {
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .btn-copiar {
+            margin-top: 16px;
+            padding: 8px 20px;
+            background: #e94560;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: none;
+        }
+        .btn-copiar:hover { background: #c73652; }
+
+        .historico {
+            margin-top: 24px;
+            text-align: left;
+        }
+        .historico h2 { font-size: 0.85rem; color: #888; margin-bottom: 10px; }
+        .historico ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .historico li {
+            background: #0f3460;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            color: #aaa;
+            word-break: break-all;
+        }
+        .historico li span { color: #555; font-size: 0.7rem; display: block; margin-top: 2px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>📷 Scanner QR Code</h1>
+    <p class="sub">Consultando Raspberry Pi a cada 1 segundo</p>
+
+    <div class="status">
+        <div class="dot" id="dot"></div>
+        <span id="status-txt">Aguardando...</span>
+    </div>
+
+    <div class="resultado">
+        <p class="label">Último QR detectado</p>
+        <p class="valor" id="qr-valor" style="display:none"></p>
+        <p class="vazio" id="qr-vazio">Nenhum QR lido ainda</p>
+    </div>
+
+    <button class="btn-copiar" id="btn-copiar" onclick="copiar()">Copiar</button>
+
+    <div class="historico">
+        <h2>Histórico</h2>
+        <ul id="historico-lista"></ul>
+    </div>
+</div>
+
+<script>
+    const API = "http://10.110.12.86:5000/qr"; 
+    let ultimo = null;
+
+    async function consultarQR() {
+        const dot = document.getElementById("dot");
+        const statusTxt = document.getElementById("status-txt");
+
+        try {
+            const res = await fetch(API);
+            const { qr } = await res.json();
+
+            dot.className = "dot ok";
+            statusTxt.textContent = "Conectado";
+
+            if (qr && qr !== ultimo) {
+                ultimo = qr;
+                mostrarQR(qr);
+                adicionarHistorico(qr);
+            }
+        } catch (e) {
+            dot.className = "dot err";
+            statusTxt.textContent = "Sem conexão com o Raspberry";
+        }
+    }
+
+    function mostrarQR(valor) {
+        document.getElementById("qr-valor").textContent = valor;
+        document.getElementById("qr-valor").style.display = "block";
+        document.getElementById("qr-vazio").style.display = "none";
+        document.getElementById("btn-copiar").style.display = "inline-block";
+    }
+
+    function copiar() {
+        navigator.clipboard.writeText(ultimo);
+        const btn = document.getElementById("btn-copiar");
+        btn.textContent = "Copiado!";
+        setTimeout(() => btn.textContent = "Copiar", 1500);
+    }
+
+    function adicionarHistorico(valor) {
+        const lista = document.getElementById("historico-lista");
+        const hora = new Date().toLocaleTimeString("pt-BR");
+        const li = document.createElement("li");
+        li.innerHTML = `${valor}<span>${hora}</span>`;
+        lista.prepend(li);
+
+        // mantém só os últimos 5
+        while (lista.children.length > 5) lista.removeChild(lista.lastChild);
+    }
+
+    setInterval(consultarQR, 1000);
+    consultarQR();
+</script>
+</body>
+</html>

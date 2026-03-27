@@ -19,8 +19,17 @@ async function getCode1() {
 
 const qrcode = new QRCode("qrcode1",{
     text: "1",
-    width: 128,
-    height: 128,
+    width: 200,
+    height: 200,
+    colorDark : "#000000",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+});
+
+const qrcode2 = new QRCode("qrcode2",{
+    text: "1",
+    width: 200,
+    height: 200,
     colorDark : "#000000",
     colorLight : "#ffffff",
     correctLevel : QRCode.CorrectLevel.H

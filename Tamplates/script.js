@@ -3,7 +3,7 @@ function alerta() {
     alert("Olá, você clicou no botão!");
 }
 
-/*
+
 
 async function getCode1() {
     const url = ""
@@ -16,8 +16,9 @@ async function getCode1() {
     }
 }
 
+
 const qrcode = new QRCode("qrcode1",{
-    text: "https://hogangnono.com",
+    text: "1",
     width: 128,
     height: 128,
     colorDark : "#000000",
@@ -25,7 +26,7 @@ const qrcode = new QRCode("qrcode1",{
     correctLevel : QRCode.CorrectLevel.H
 });
 
-*/
+
 async function criarCode() {
     //const dados = await getCode1()
 

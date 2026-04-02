@@ -5,9 +5,10 @@ from flask import Flask, jsonify, render_template
 app = Flask(__name__)
 
 ultimo_qr = {"data": None}
+contagem = {"valor": 0}
 lock = threading.Lock()
 
-url = "http://172.20.32.35:8080/video"  
+url = "http://172.20.32.35:8080/video" 
 
 @app.route("/")
 def index():
@@ -16,9 +17,21 @@ def index():
 @app.route("/qr", methods=["GET"])
 def get_qr():
     with lock:
-        return jsonify({"qr": ultimo_qr["data"]})
+        return jsonify({
+            "qr": ultimo_qr["data"],
+            "contagem": contagem["valor"]
+        })
+
+@app.route("/reset", methods=["GET"])
+def reset():
+    with lock:
+        contagem["valor"] = 0
+        ultimo_qr["data"] = None
+    return jsonify({"mensagem": "Contador resetado", "contagem": 0})
 
 def camera_loop():
+    ultimo_lido = None  
+
     cap = cv2.VideoCapture(url)
     detector = cv2.QRCodeDetector()
 
@@ -46,12 +59,23 @@ def camera_loop():
                 cv2.line(frame, pt1, pt2, (0, 255, 0), 3)
 
             if data:
-                with lock:
-                    ultimo_qr["data"] = data
+                if data == "1" and data != ultimo_lido:
+                    with lock:
+                        contagem["valor"] += 1
+                        ultimo_qr["data"] = data
+                    print(f"QR '1' detectado! Contagem: {contagem['valor']}")
+
+                elif data != "1":
+                    with lock:
+                        ultimo_qr["data"] = data
+
+                ultimo_lido = data
+
                 x, y = pontos[0]
-                cv2.putText(frame, data, (x, y - 10),
+                cv2.putText(frame, f"{data} | count: {contagem['valor']}", (x, y - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                print("QR Code detectado:", data)
+        else:
+            ultimo_lido = None
 
         cv2.imshow("Scanner QR - Raspberry", frame)
 
